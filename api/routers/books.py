@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
@@ -36,6 +36,18 @@ fake_library_db = [
 ]
 
 
-@router.get("/books/")
+@router.get("/")
 async def read_books() -> list:
     return fake_library_db
+
+
+@router.get("/{book_id}/")
+async def get_book(book_id: int):
+    books_id_lst = [v for item in fake_library_db for k, v in item.items() if k == "id"]
+
+    if book_id not in books_id_lst:
+        raise HTTPException(status_code=404, detail="Книга не найдена")
+    else:
+        for book in fake_library_db:
+            if book["id"] == book_id:
+                return {"book": book}
