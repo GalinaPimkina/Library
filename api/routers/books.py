@@ -35,3 +35,7 @@ fake_library_db = [
     },
 ]
 
+
+@router.get("/books/")
+async def read_books() -> list:
+    return fake_library_db
