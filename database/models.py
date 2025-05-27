@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 
 class Base(DeclarativeBase):
@@ -24,9 +25,17 @@ class User(Base):
         return f"User(id={self.id!r}, username={self.username!r})"
 
 
-class Student(Base):
-    pass
-
-
 class Book(Base):
     pass
+
+
+class Student(Base):
+    """Студент, читатель.
+    Регистрируется через библиотекаря User,
+    выбранные книги добавляются в список books"""
+
+    __tablename__ = "student"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    full_name: Mapped[str] # в чем разница между optional[str] и [str]
+    books: Mapped[list["Book"]] = relationship(back_populates="student", default=None)
