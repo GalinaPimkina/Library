@@ -39,3 +39,6 @@ class Student(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] # в чем разница между optional[str] и [str]
     books: Mapped[list["Book"]] = relationship(back_populates="student", default=None)
+
+    def __repr__(self):
+        return f"Student(id={self.id}, fullname={self.full_name})"
