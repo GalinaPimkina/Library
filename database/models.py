@@ -1,4 +1,5 @@
 from typing import Optional
+from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -25,8 +26,12 @@ class User(Base):
         return f"User(id={self.id!r}, username={self.username!r})"
 
 
-class Book(Base):
-    pass
+student_book_relation_table = Table(
+    "student_book_relation_table",
+    Base.metadata,
+    Column("student_id", ForeignKey("student.id"), primary_key=True),
+    Column("book_id", ForeignKey("book.id"), primary_key=True),
+)
 
 
 class Student(Base):
@@ -38,7 +43,17 @@ class Student(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] # в чем разница между optional[str] и [str]
-    books: Mapped[list["Book"]] = relationship(back_populates="student", default=None)
+    books: Mapped[list["Book"]] = relationship(secondary=student_book_relation_table, back_populates="student")
 
     def __repr__(self):
         return f"Student(id={self.id}, fullname={self.full_name})"
+
+
+class Book(Base):
+    __tablename__ = "book"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    total_amount: Mapped[int] = mapped_column(default=1) # всего книг в системе
+    taken_amount: Mapped[int] = mapped_column(default=0)# взятые книги
+    student: Mapped[list["Student"]] = relationship(secondary=student_book_relation_table, back_populates="book")
