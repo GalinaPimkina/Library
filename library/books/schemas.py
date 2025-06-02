@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
 
-class Book(BaseModel):
-    id: int
+class BaseBook(BaseModel):
     author: str
     title: str
     amount: int
