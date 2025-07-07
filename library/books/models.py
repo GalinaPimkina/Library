@@ -26,7 +26,7 @@ class Book(Base):
     title: Mapped[str]
     total_amount: Mapped[int] = mapped_column(default=1) # всего книг в системе
     taken_amount: Mapped[int] = mapped_column(default=0)# взятые книги
-    student: Mapped[list["Student"]] = relationship(secondary=student_book_relation_table, back_populates="book")
+    student: Mapped[list["Student"]] = relationship(secondary=student_book_relation_table, backref="book")
 
     def __str__(self):
         return str(self.title)
