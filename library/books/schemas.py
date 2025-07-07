@@ -1,11 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class BaseBook(BaseModel):
-    author: str
-    title: str
-    amount: int
+    model_config = ConfigDict(from_attributes=True)
 
-
-class Book(BaseBook):
     id: int
+    title: str
+    total_amount: int
+    taken_amount: int
