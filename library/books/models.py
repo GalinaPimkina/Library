@@ -8,12 +8,12 @@ from library.database import Base
 class Book(Base):
     __tablename__ = "books"
 
-    title: Mapped[str] = mapped_column(nullable=False)
-    author: Mapped[str] = mapped_column(nullable=False)
-    publish_date: Mapped[int] = mapped_column(nullable=False)
+    title: Mapped[str]
+    author: Mapped[str]
+    publish_date: Mapped[int]
 
-    total_amount: Mapped[int] = mapped_column(default=1, server_default="1", nullable=True) #всего книг в библиотеке
-    taken_amount: Mapped[int] = mapped_column(default=0, server_default="0", nullable=True) #взятые книги
+    total_amount: Mapped[int | None] = mapped_column(default=1, server_default="1") #всего книг в библиотеке
+    taken_amount: Mapped[int | None] = mapped_column(default=0, server_default="0") #взятые книги
 
     students: Mapped[list["Student"]] = relationship(secondary="students_books", back_populates="books")
 
@@ -24,8 +24,8 @@ class Book(Base):
 class Student(Base):
     __tablename__ = "students"
 
-    full_name: Mapped[str] = mapped_column(nullable=False)
-    group_number: Mapped[str] = mapped_column(nullable=False)
+    full_name: Mapped[str]
+    group_number: Mapped[str]
     books: Mapped[list["Book"]] = relationship(secondary="students_books", back_populates="students")
 
     def __repr__(self):
