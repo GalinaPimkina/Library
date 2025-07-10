@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from books.models import Book
+from models import Book
 from books.schemas import BookPublic
 from database import get_session
 
