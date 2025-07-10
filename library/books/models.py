@@ -12,8 +12,8 @@ class Book(Base):
     author: Mapped[str] = mapped_column(nullable=False)
     publish_date: Mapped[int] = mapped_column(nullable=False)
 
-    total_amount: Mapped[int] = mapped_column(default=1) #всего книг в библиотеке
-    taken_amount: Mapped[int] = mapped_column(default=0, nullable=True) #взятые книги
+    total_amount: Mapped[int] = mapped_column(default=1, server_default="1", nullable=True) #всего книг в библиотеке
+    taken_amount: Mapped[int] = mapped_column(default=0, server_default="0", nullable=True) #взятые книги
 
     students: Mapped[list["Student"]] = relationship(secondary="students_books", back_populates="books")
 
