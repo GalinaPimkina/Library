@@ -1,1 +1,8 @@
 Generic single-database configuration with an async dbapi.
+
+#создание миграции
+alembic revision --autogenerate -m "initial revision"
+
+#применить миграцию
+alembic upgrade head
+
