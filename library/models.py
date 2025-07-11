@@ -26,7 +26,7 @@ class Student(Base):
 
     full_name: Mapped[str]
     group_number: Mapped[str]
-    books: Mapped[list["Book"]] = relationship(secondary="students_books", back_populates="students")
+    books: Mapped[list["Book"]] = relationship(secondary="students_books", back_populates="students", lazy="selectin")
 
     def __repr__(self):
         return f"Student(id={self.id}, fullname={self.full_name})"
