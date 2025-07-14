@@ -2,27 +2,29 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from models import Student
+from students.schemas import StudentPublic
 
 
-class BookSystem(BaseModel):
+class BookPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    title: str
+    author: str
+    publish_date: int
+    total_amount: int
+
+
+class BookSystem(BookPublic):
     id: int
     created_at: datetime
     updated_at: datetime
 
 
-class BookPublic(BookSystem):
-    title: str
-    author: str
-    publish_date: int
-    total_amount: int
+class BookListStudent(BookPublic):
     taken_amount: int
+    students: list["StudentPublic"] = []
 
 
-class BookStudent(BookSystem):
-    title: str
-    taken_amount: int
-    # students: list["Student"]
+class BookUpdate(BookPublic):
+    pass
 
