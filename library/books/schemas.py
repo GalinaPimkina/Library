@@ -1,8 +1,5 @@
 from datetime import datetime
-
 from pydantic import BaseModel, ConfigDict
-
-from students.schemas import StudentPublic
 
 
 class BookPublic(BaseModel):
@@ -32,3 +29,6 @@ class BookUpdate(BookPublic):
 class BookCreate(BookPublic):
     pass
 
+
+from students.schemas import StudentPublic
+BookListStudent.model_rebuild()
