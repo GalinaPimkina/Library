@@ -1,4 +1,5 @@
-from books.schemas import *  #datetime, BaseModel, ConfigDict циклический импорт
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict
 
 
 class StudentPublic(BaseModel):
@@ -20,3 +21,7 @@ class StudentListBook(StudentPublic):
 
 class StudentUpdate(StudentPublic):
     pass
+
+
+from books.schemas import BookPublic
+StudentListBook.model_rebuild()
