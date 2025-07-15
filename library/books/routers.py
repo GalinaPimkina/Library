@@ -39,12 +39,12 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
 @router.get(
     "/{book_id}",
     summary="Книга по id",
-    response_model=list[BookListStudent],
+    response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
 async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Book).where(Book.id == book_id))
-    book = result.scalars().all()
+    book = result.scalars().one()
     if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
     return book
