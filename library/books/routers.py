@@ -29,11 +29,11 @@ router = APIRouter(prefix='/books', tags=['Книги'])
     status_code=status.HTTP_200_OK
 )
 async def get_all_books(session: AsyncSession = Depends(get_session)):
-    books = await session.execute(select(Book).order_by(Book.title))
-    result = books.scalars().all()
-    if not result:
+    result = await session.execute(select(Book).order_by(Book.title))
+    books = result.scalars().all()
+    if not books:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книги не найдены")
-    return result
+    return books
 
 
 @router.get(
@@ -43,11 +43,11 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     status_code=status.HTTP_200_OK
 )
 async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_session)):
-    book = await session.execute(select(Book).where(Book.id == book_id))
-    result = book.scalars().all()
-    if not result:
+    result = await session.execute(select(Book).where(Book.id == book_id))
+    book = result.scalars().all()
+    if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-    return result
+    return book
 
 
 @router.get(
@@ -57,11 +57,11 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
     status_code=status.HTTP_200_OK
 )
 async def get_book(query: str, session: AsyncSession = Depends(get_session)):
-    books = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
-    result = books.scalars().all()
-    if not result:
+    result = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
+    book = result.scalars().all()
+    if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-    return result
+    return book
 
 
 @router.put(
