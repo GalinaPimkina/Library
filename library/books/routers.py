@@ -37,7 +37,7 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
 
 
 @router.get(
-    "/{book_id}",
+    "/{book_id}/",
     summary="Книга по id",
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
