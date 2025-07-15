@@ -28,3 +28,7 @@ class BookListStudent(BookPublic):
 class BookUpdate(BookPublic):
     pass
 
+
+class BookCreate(BookPublic):
+    pass
+
