@@ -1,19 +1,33 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from starlette import status
 
 from models import Book
-from books.schemas import BookPublic, BookListStudent, BookSystem, BookUpdate
+from books.schemas import (
+    BookPublic,
+    BookListStudent,
+    BookSystem,
+    BookUpdate,
+    BookCreate
+)
 from database import get_session
 
 router = APIRouter(prefix='/books', tags=['Книги'])
 
 
-@router.get("/", summary="Получить список всех книг в библиотеке", response_model=list[BookPublic], status_code=status.HTTP_200_OK)
+@router.get(
+    "/",
+    summary="Получить список всех книг в библиотеке",
+    response_model=list[BookPublic],
+    status_code=status.HTTP_200_OK
+)
 async def get_all_books(session: AsyncSession = Depends(get_session)):
     books = await session.execute(select(Book).order_by(Book.title))
     result = books.scalars().all()
@@ -22,7 +36,12 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     return result
 
 
-@router.get("/{book_id}", summary="Книга по id", response_model=list[BookListStudent], status_code=status.HTTP_200_OK)
+@router.get(
+    "/{book_id}",
+    summary="Книга по id",
+    response_model=list[BookListStudent],
+    status_code=status.HTTP_200_OK
+)
 async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_session)):
     book = await session.execute(select(Book).where(Book.id == book_id))
     result = book.scalars().all()
@@ -31,7 +50,12 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
     return result
 
 
-@router.get("/search/", summary="Найти книгу по названию", response_model=list[BookPublic], status_code=status.HTTP_200_OK)
+@router.get(
+    "/search/",
+    summary="Найти книгу по названию",
+    response_model=list[BookPublic],
+    status_code=status.HTTP_200_OK
+)
 async def get_book(query: str, session: AsyncSession = Depends(get_session)):
     books = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
     result = books.scalars().all()
@@ -41,7 +65,7 @@ async def get_book(query: str, session: AsyncSession = Depends(get_session)):
 
 
 @router.put(
-    "/update/",
+    "/edit/",
     summary="Редактировать книгу",
     response_model=BookSystem,
     status_code=status.HTTP_200_OK,
@@ -59,3 +83,15 @@ async def update_book(book_id: int, book_update: BookUpdate, session: AsyncSessi
     await session.commit()
     return book
 
+
+@router.post(
+    "/add/",
+    summary="Добавить новую книгу",
+    response_model=BookSystem,
+    status_code=status.HTTP_201_CREATED
+)
+async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_session)):
+    book = Book(**new_book.dict())
+    session.add(book)
+    await session.commit()
+    return book
