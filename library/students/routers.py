@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -9,8 +9,7 @@ from starlette import status
 
 from database import get_session
 from models import Student
-from students.schemas import StudentPublic, StudentListBook
-
+from students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
@@ -55,4 +54,25 @@ async def get_student_from_id(student_id: int, session: AsyncSession = Depends(g
         student = result.scalars().one()
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+    return student
+
+
+@router.put(
+    "/{student_id}/edit/",
+    summary="Редактировать информацию о студенте",
+    response_model=StudentSystem,
+    status_code=status.HTTP_200_OK,
+)
+async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
+    try:
+        result = await session.execute(select(Student).where(Student.id == student_id))
+        student = result.scalars().one()
+    except NoResultFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+
+    for field, value in student_update.dict(exclude_unset=True).items():
+        setattr(student, field, value)
+
+    student.updated_at = datetime.now()
+    await session.commit()
     return student

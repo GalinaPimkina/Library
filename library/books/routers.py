@@ -69,7 +69,7 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
 
 @router.put(
     "/{book_id}/edit/",
-    summary="Редактировать книгу",
+    summary="Редактировать информацию о книге",
     response_model=BookSystem,
     status_code=status.HTTP_200_OK,
 )
