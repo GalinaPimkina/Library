@@ -1,9 +1,10 @@
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException
+    HTTPException, Query
 )
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,8 +38,22 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
 
 
 @router.get(
+    "/search/",
+    summary="Найти книгу по названию",
+    response_model=list[BookPublic],
+    status_code=status.HTTP_200_OK
+)
+async def get_book(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
+    books = result.scalars().all()
+    if not books:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+    return books
+
+
+@router.get(
     "/{book_id}/",
-    summary="Книга по id",
+    summary="Найти книгу по id",
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
@@ -50,22 +65,8 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
     return book
 
 
-@router.get(
-    "/search/",
-    summary="Найти книгу по названию",
-    response_model=list[BookPublic],
-    status_code=status.HTTP_200_OK
-)
-async def get_book(query: str, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
-    book = result.scalars().all()
-    if not book:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-    return book
-
-
 @router.put(
-    "/edit/",
+    "/{book_id}/edit/",
     summary="Редактировать книгу",
     response_model=BookSystem,
     status_code=status.HTTP_200_OK,
@@ -98,7 +99,7 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
 
 
 @router.delete(
-    "/{book_id}/",
+    "/{book_id}/delete/",
     summary="Удалить книгу",
     status_code=status.HTTP_200_OK
 )
