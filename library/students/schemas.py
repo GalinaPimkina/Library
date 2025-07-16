@@ -23,5 +23,9 @@ class StudentUpdate(StudentPublic):
     pass
 
 
+class StudentCreate(StudentPublic):
+    pass
+
+
 from books.schemas import BookPublic
 StudentListBook.model_rebuild()
