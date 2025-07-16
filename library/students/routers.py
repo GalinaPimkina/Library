@@ -1,5 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select, or_
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -26,14 +30,29 @@ async def get_all_students(session: AsyncSession = Depends(get_session)):
 
 
 @router.get(
+    "/search/",
+    summary="Найти студента по ФИО или номеру группы",
+    response_model=list[StudentPublic],
+    status_code=status.HTTP_200_OK
+)
+async def get_student(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Student).filter(or_(Student.full_name.ilike(f"%{query}%"), (Student.group_number.ilike(f"%{query}%")))))
+    students = result.scalars().all()
+    if not students:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+    return students
+
+
+@router.get(
     "/{student_id}/",
-    summary="Найти студента по id",
+    summary="Детальная информация по студенту, ввести id",
     response_model=StudentListBook,
     status_code=status.HTTP_200_OK
 )
 async def get_student_from_id(student_id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Student).where(Student.id == student_id))
-    student = result.scalars().one()
-    if not student:
+    try:
+        result = await session.execute(select(Student).where(Student.id == student_id))
+        student = result.scalars().one()
+    except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
     return student
