@@ -9,7 +9,7 @@ from starlette import status
 
 from database import get_session
 from models import Student
-from students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate
+from students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
@@ -74,5 +74,18 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
         setattr(student, field, value)
 
     student.updated_at = datetime.now()
+    await session.commit()
+    return student
+
+
+@router.post(
+    "/add/",
+    summary="Добавить нового студента",
+    response_model=StudentSystem,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_student(new_student: StudentCreate, session: AsyncSession = Depends(get_session)):
+    student = Student(**new_student.dict())
+    session.add(student)
     await session.commit()
     return student
