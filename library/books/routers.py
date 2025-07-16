@@ -7,6 +7,7 @@ from fastapi import (
     HTTPException, Query
 )
 from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -53,14 +54,15 @@ async def get_book(query: Annotated[str, Query()], session: AsyncSession = Depen
 
 @router.get(
     "/{book_id}/",
-    summary="Найти книгу по id",
+    summary="Детальная информация по книге, ввести id",
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
 async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).where(Book.id == book_id))
-    book = result.scalars().one()
-    if not book:
+    try:
+        result = await session.execute(select(Book).where(Book.id == book_id))
+        book = result.scalars().one()
+    except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
     return book
 
@@ -72,9 +74,10 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
     status_code=status.HTTP_200_OK,
 )
 async def update_book(book_id: int, book_update: BookUpdate, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).where(Book.id == book_id))
-    book = result.scalars().one()
-    if book is None:
+    try:
+        result = await session.execute(select(Book).where(Book.id == book_id))
+        book = result.scalars().one()
+    except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
 
     for field, value in book_update.dict(exclude_unset=True).items():
@@ -104,9 +107,10 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     status_code=status.HTTP_200_OK
 )
 async def delete_book(book_id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).where(Book.id == book_id))
-    book = result.scalars().one()
-    if not book:
+    try:
+        result = await session.execute(select(Book).where(Book.id == book_id))
+        book = result.scalars().one()
+    except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
     await session.delete(book)
     await session.commit()
