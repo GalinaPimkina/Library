@@ -112,6 +112,7 @@ async def delete_book(book_id: int, session: AsyncSession = Depends(get_session)
         book = result.scalars().one()
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+
     await session.delete(book)
     await session.commit()
     return {"message": "Книга удалена"}

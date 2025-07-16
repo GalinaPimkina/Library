@@ -89,3 +89,20 @@ async def create_student(new_student: StudentCreate, session: AsyncSession = Dep
     session.add(student)
     await session.commit()
     return student
+
+
+@router.delete(
+    "/{student_id}/delete/",
+    summary="Удалить студента",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_student(student_id: int, session: AsyncSession = Depends(get_session)):
+    try:
+        result = await session.execute(select(Student).where(Student.id == student_id))
+        student = result.scalars().one()
+    except NoResultFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+
+    await session.delete(student)
+    await session.commit()
+    return {"message": "Студент удален"}
