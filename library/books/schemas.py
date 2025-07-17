@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, field_validator, Field
 
 
 class BookPublic(BaseModel):
@@ -25,7 +27,7 @@ class BookSystem(BookPublic):
 
 
 class BookListStudent(BookPublic):
-    taken_amount: int | None = None
+    # taken_amount: Annotated[int | None, Field(ge=0, le=10)] = None
     students: list["StudentPublic"] = []
 
 
@@ -37,5 +39,5 @@ class BookCreate(BookPublic):
     pass
 
 
-from students.schemas import StudentPublic
+from library.students.schemas import StudentPublic
 BookListStudent.model_rebuild()

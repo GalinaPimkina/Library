@@ -7,12 +7,14 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from database import get_session
-from models import Student
-from students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
+from library.database import get_session
+from library.models import Student
+from library.students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
+
+# ---------------------------get-----------------------------------
 
 @router.get(
     "/",
@@ -57,6 +59,8 @@ async def get_student_from_id(student_id: Annotated[int, Path(ge=1)], session: A
     return student
 
 
+# ---------------------------put-----------------------------------
+
 @router.put(
     "/{student_id}/edit/",
     summary="Редактировать информацию о студенте",
@@ -78,6 +82,8 @@ async def update_student(student_id: Annotated[int, Path(ge=1)], student_update:
     return student
 
 
+# ---------------------------post-----------------------------------
+
 @router.post(
     "/add/",
     summary="Добавить нового студента",
@@ -90,6 +96,8 @@ async def create_student(new_student: StudentCreate, session: AsyncSession = Dep
     await session.commit()
     return student
 
+
+# ---------------------------delete-----------------------------------
 
 @router.delete(
     "/{student_id}/delete/",

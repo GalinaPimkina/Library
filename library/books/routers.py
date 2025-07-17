@@ -11,18 +11,20 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models import Book
-from books.schemas import (
+from library.models import Book
+from library.books.schemas import (
     BookPublic,
     BookListStudent,
     BookSystem,
     BookUpdate,
     BookCreate
 )
-from database import get_session
+from library.database import get_session
 
 router = APIRouter(prefix='/books', tags=['Книги'])
 
+
+# -----------------------------get------------------------------
 
 @router.get(
     "/",
@@ -44,7 +46,7 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     response_model=list[BookPublic],
     status_code=status.HTTP_200_OK
 )
-async def get_book(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Book).filter(Book.title.ilike(f"%{query}%")))
     books = result.scalars().all()
     if not books:
@@ -58,7 +60,7 @@ async def get_book(query: Annotated[str, Query()], session: AsyncSession = Depen
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
-async def get_book_from_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
+async def get_book_by_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Book).where(Book.id == book_id))
         book = result.scalars().one()
@@ -66,6 +68,8 @@ async def get_book_from_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
     return book
 
+
+# -----------------------------put------------------------------
 
 @router.put(
     "/{book_id}/edit/",
@@ -88,6 +92,8 @@ async def update_book(book_id: Annotated[int, Path(ge=1)], book_update: BookUpda
     return book
 
 
+# -----------------------------post------------------------------
+
 @router.post(
     "/add/",
     summary="Добавить новую книгу",
@@ -100,6 +106,27 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     await session.commit()
     return book
 
+
+# @router.post(
+#     "/{book_id}/share/{student_id}/",
+#     summary="Выдать книгу",
+#     response_model=StudentListBook,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def share_book(
+#         book_id: Annotated[int, Path(ge=1)],
+#         student_id: Annotated[int, Path(ge=1)],
+#         session: AsyncSession = Depends(get_session)
+# ):
+#     try:
+#         result = await session.execute(select(Book).where(Book.id == book_id))
+#         book = result.scalars().one()
+#     except NoResultFound:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+#
+#
+#
+# -----------------------------delete------------------------------
 
 @router.delete(
     "/{book_id}/delete/",
