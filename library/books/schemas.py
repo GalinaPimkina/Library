@@ -5,10 +5,10 @@ from pydantic import BaseModel, ConfigDict
 class BookPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    title: str
-    author: str
-    publish_date: int
-    total_amount: int
+    title: str | None = None
+    author: str | None = None
+    publish_date: int | None = None
+    total_amount: int | None = None
 
 
 class BookSystem(BookPublic):
@@ -18,7 +18,7 @@ class BookSystem(BookPublic):
 
 
 class BookListStudent(BookPublic):
-    taken_amount: int
+    taken_amount: int | None = None
     students: list["StudentPublic"] = []
 
 
