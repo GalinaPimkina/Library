@@ -1,12 +1,14 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class StudentPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    full_name: str | None = None
-    group_number: str | None = None
+    full_name: Annotated[str | None, Field(max_length=50)] = None
+    group_number: Annotated[str | None, Field(max_length=5)] = None
 
 
 class StudentSystem(StudentPublic):
