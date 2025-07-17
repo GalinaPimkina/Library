@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from sqlalchemy import select, or_
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -48,7 +48,7 @@ async def get_student(query: Annotated[str, Query()], session: AsyncSession = De
     response_model=StudentListBook,
     status_code=status.HTTP_200_OK
 )
-async def get_student_from_id(student_id: int, session: AsyncSession = Depends(get_session)):
+async def get_student_from_id(student_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Student).where(Student.id == student_id))
         student = result.scalars().one()
@@ -63,7 +63,7 @@ async def get_student_from_id(student_id: int, session: AsyncSession = Depends(g
     response_model=StudentSystem,
     status_code=status.HTTP_200_OK,
 )
-async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
+async def update_student(student_id: Annotated[int, Path(ge=1)], student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Student).where(Student.id == student_id))
         student = result.scalars().one()
@@ -96,7 +96,7 @@ async def create_student(new_student: StudentCreate, session: AsyncSession = Dep
     summary="Удалить студента",
     status_code=status.HTTP_200_OK,
 )
-async def delete_student(student_id: int, session: AsyncSession = Depends(get_session)):
+async def delete_student(student_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Student).where(Student.id == student_id))
         student = result.scalars().one()
