@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException, Query
+    HTTPException, Query, Path
 )
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -58,7 +58,7 @@ async def get_book(query: Annotated[str, Query()], session: AsyncSession = Depen
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
-async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_session)):
+async def get_book_from_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Book).where(Book.id == book_id))
         book = result.scalars().one()
@@ -73,7 +73,7 @@ async def get_book_from_id(book_id: int, session: AsyncSession = Depends(get_ses
     response_model=BookSystem,
     status_code=status.HTTP_200_OK,
 )
-async def update_book(book_id: int, book_update: BookUpdate, session: AsyncSession = Depends(get_session)):
+async def update_book(book_id: Annotated[int, Path(ge=1)], book_update: BookUpdate, session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Book).where(Book.id == book_id))
         book = result.scalars().one()
@@ -106,7 +106,7 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     summary="Удалить книгу",
     status_code=status.HTTP_200_OK
 )
-async def delete_book(book_id: int, session: AsyncSession = Depends(get_session)):
+async def delete_book(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
     try:
         result = await session.execute(select(Book).where(Book.id == book_id))
         book = result.scalars().one()
