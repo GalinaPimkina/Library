@@ -1,11 +1,12 @@
 import pytest
+from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
 
 from library.main import app
 
 
 @pytest.mark.parametrize(
-    "query, status_code, res",
+    "query, status_code, res, expected_exception",
     [
         (
                 "онегин",
@@ -15,7 +16,9 @@ from library.main import app
                     "author": "пушкин",
                     "publish_date": 2006,
                     "total_amount": 10
-                }]
+                },
+                ],
+                None,
         ),
         (
                 "о",
@@ -33,18 +36,21 @@ from library.main import app
                         "publish_date": 2022,
                         "total_amount": 7
                     }
-                ]
+                ],
+                None,
         ),
         (
                 "екореро",
                 404,
                 {
                     "detail": "Книга не найдена"
-                }),
+                },
+                HTTPException,
+        ),
     ]
 )
 @pytest.mark.asyncio
-async def test_get_book_by_title(query, status_code, res):
+async def test_get_book_by_title(query, status_code, res, expected_exception):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/books/search/?title={query}")
         assert response.status_code == status_code
@@ -52,7 +58,7 @@ async def test_get_book_by_title(query, status_code, res):
 
 
 @pytest.mark.parametrize(
-    "book_id, status_code, res",
+    "book_id, status_code, res, expected_exception",
     [
         (
             1,
@@ -63,14 +69,16 @@ async def test_get_book_by_title(query, status_code, res):
                 "publish_date": 1996,
                 "total_amount": 3,
                 "students": []
-            }
+            },
+            None,
         ),
         (
             100,
             404,
             {
                 "detail": "Книга не найдена"
-            }
+            },
+            HTTPException,
         ),
         (
             0,
@@ -91,12 +99,13 @@ async def test_get_book_by_title(query, status_code, res):
                         "type": "greater_than_equal",
                     },
                         ]
-            }
+            },
+            HTTPException,
         ),
     ]
 )
 @pytest.mark.asyncio
-async def test_get_book_by_id(book_id, status_code, res):
+async def test_get_book_by_id(book_id, status_code, res, expected_exception):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/books/{book_id}/")
         assert response.status_code == status_code
