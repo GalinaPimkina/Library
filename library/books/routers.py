@@ -101,7 +101,7 @@ async def update_book(book_id: Annotated[int, Path(ge=1)], book_update: BookUpda
     status_code=status.HTTP_201_CREATED
 )
 async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_session)):
-    book = Book(**new_book.dict())
+    book = Book(**new_book.model_dump())
     session.add(book)
     await session.commit()
     return book
