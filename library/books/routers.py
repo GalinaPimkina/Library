@@ -84,7 +84,7 @@ async def update_book(book_id: Annotated[int, Path(ge=1)], book_update: BookUpda
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
 
-    for field, value in book_update.dict(exclude_unset=True).items():
+    for field, value in book_update.model_dump(exclude_unset=True).items():
         setattr(book, field, value)
 
     book.updated_at = datetime.now()
