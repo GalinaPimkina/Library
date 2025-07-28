@@ -49,13 +49,22 @@ class TestBook:
             response = await client.post(f"/books/add/", json=input_json)
             assert response.status_code == status_code
 
+    @pytest.mark.parametrize(
+        "input_json, status_code, expected_exception",
+        [
+            ({"title": "ABC", "author": "AUTH", "publish_date": 2022, "total_amount": 7}, 200, None),
+            ({"title": "ABC", "author": "AUTH", "publish_date": 2222, "total_amount": 10}, 422, HTTPException),
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_update_item(self, input_json, status_code, expected_exception):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.put(f"/books/1/edit/", json=input_json)
+            assert response.status_code == status_code
+            data = response.json()
+            assert data["title"] == "ABC"
 
-# def test_update_item(item_id):
-#     response = client.put(f"/items/{item_id}", json={"name": "Updated Item", "description": "Updated description"})
-#     assert response.status_code == 200
-#     data = response.json()
-#     assert data["name"] == "Updated Item"
-#
+
 # def test_delete_item(item_id):
 #     response = client.delete(f"/items/{item_id}")
 #     assert response.status_code == 200
