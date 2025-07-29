@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, field_validator, Field
 
 
-class BookPublic(BaseModel):
+class BookUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     title: str | None = None
@@ -20,22 +19,21 @@ class BookPublic(BaseModel):
         return value
 
 
-class BookSystem(BookPublic):
-    id: int
+class BookSystem(BookUpdate):
     created_at: datetime
     updated_at: datetime
 
 
-class BookListStudent(BookPublic):
+class BookListStudent(BookUpdate):
     # taken_amount: Annotated[int | None, Field(ge=0, le=10)] = None
     students: list["StudentPublic"] = []
 
 
-class BookUpdate(BookPublic):
-    pass
+class BookPublic(BookUpdate):
+    id: int
 
 
-class BookCreate(BookPublic):
+class BookCreate(BookUpdate):
     pass
 
 
