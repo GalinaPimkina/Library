@@ -69,16 +69,12 @@ class TestBook:
     async def test_update_item(self, input_json, status_code, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.put(f"/books/4/edit/", json=input_json)
-            data = response.json()
             assert response.status_code == status_code
 
-            # assert data["title"] == "ABC"
-
-
-
-
-# def test_delete_item(item_id):
-#     response = client.delete(f"/items/{item_id}")
-#     assert response.status_code == 200
-#     response = client.get(f"/items/{item_id}")
-#     assert response.status_code == 404
+    @pytest.mark.asyncio
+    async def test_delete_book(self, get_last_book_id):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.delete(f"/books/{get_last_book_id}/delete/")
+            assert response.status_code == 200
+            response = await client.get(f"/books/{get_last_book_id}/")
+            assert response.status_code == 404
