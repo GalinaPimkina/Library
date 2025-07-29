@@ -1,15 +1,24 @@
 import pytest
+import pytest_asyncio
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
 
 from library.main import app
 
 
+@pytest_asyncio.fixture(scope="function")
+async def get_last_book_id():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.get(f"/books/")
+        data = response.json()
+        return data[4]["id"]
+
+
 class TestBook:
     @pytest.mark.parametrize(
         "query, status_code, res, expected_exception",
         [
-            ("онегин",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10},],None,),
+            ("онегин",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10, "id": 2},],None,),
             # ("о",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10},{"title": "пикник на обочине","author": "братья стругацкие","publish_date": 2022,"total_amount": 7}],None,),
             ("екореро",404,{"detail": "Книга не найдена"},HTTPException,),
         ]
