@@ -33,7 +33,7 @@ router = APIRouter(prefix='/books', tags=['Книги'])
     status_code=status.HTTP_200_OK
 )
 async def get_all_books(session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).order_by(Book.title))
+    result = await session.execute(select(Book).order_by(Book.id))
     books = result.scalars().all()
     if not books:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книги не найдены")
