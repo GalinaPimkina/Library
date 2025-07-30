@@ -91,7 +91,7 @@ async def update_student(student_id: Annotated[int, Path(ge=1)], student_update:
     status_code=status.HTTP_201_CREATED,
 )
 async def create_student(new_student: StudentCreate, session: AsyncSession = Depends(get_session)):
-    student = Student(**new_student.dict())
+    student = Student(**new_student.model_dump())
     session.add(student)
     await session.commit()
     return student
