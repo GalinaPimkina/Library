@@ -9,6 +9,8 @@ from library.main import app
 
 @pytest_asyncio.fixture(scope="function")
 async def get_last_book_id():
+    '''для теста с удалением книги получает id=5 по списку книги, которая в предыдущем тесте через метод create.
+    книги отстортированы по возрастанию id.'''
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/books/")
         data = response.json()
