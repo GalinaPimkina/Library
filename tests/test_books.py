@@ -22,9 +22,9 @@ class TestBook:
     @pytest.mark.parametrize(
         "title, expected_status, res, expected_exception",
         [
-            ("онегин",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10, "id": 2},],None,),
-            ("о",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10, "id": 2},{"title": "пикник на обочине","author": "братья стругацкие","publish_date": 2022,"total_amount": 7, "id": 3}],None,),
-            ("екореро",404,{"detail": "Книга не найдена"},HTTPException,),
+            ("book_2",200,[{"title": "test_book_2","author": "test_author_2","publish_date": 2006,"total_amount": 10, "id": 2},],None,),
+            ("book",200,[{"title": "test_book_1","author": "test_author_1","publish_date": 1996,"total_amount": 3,"id": 1},{"title": "test_book_2","author": "test_author_2", "publish_date": 2006,"total_amount": 10,"id": 2},{"title": "test_book_3","author": "test_author_3","publish_date": 2022,"total_amount": 7,"id": 3},],None,),
+            ("bookbook",404,{"detail": "Книга не найдена"},HTTPException,),
         ]
     )
     @pytest.mark.asyncio
@@ -38,7 +38,7 @@ class TestBook:
     @pytest.mark.parametrize(
         "book_id, expected_status, res, expected_exception",
         [
-            (1, 200, {"title": "KOLOBOK", "author": "бабушка и дедушка", "publish_date": 1996, "total_amount": 3, 'students':[{'full_name': 'семенов семен семенович','group_number': '34вп',},]}, None,),
+            (1, 200, {"title": "test_book_1", "author": "test_author_1", "publish_date": 1996, "total_amount": 3, 'students':[{'full_name': 'test_student_2','group_number': 't_g_2',},]}, None,),
             (100, 404, {"detail": "Книга не найдена"}, HTTPException,),
             (0, 422, {"detail": [{"ctx": {"ge": 1,}, "input": "0", "loc": ["path", "book_id",], "msg": "Input should be greater than or equal to 1", "type": "greater_than_equal",},]}, HTTPException,),
         ]
@@ -54,8 +54,8 @@ class TestBook:
     @pytest.mark.parametrize(
         "input_json, expected_status, expected_exception",
         [
-            ({"title": "abc", "author": "auth", "publish_date": 2022, "total_amount": 10}, 201, None),
-            ({"title": "abc", "author": "auth", "publish_date": 2222, "total_amount": 10}, 422, HTTPException),
+            ({"title": "test_book_5", "author": "test_author_5", "publish_date": 2022, "total_amount": 10}, 201, None),
+            ({"title": "test_book_6", "author": "test_author_6", "publish_date": 2222, "total_amount": 10}, 422, HTTPException),
         ]
     )
     @pytest.mark.asyncio
