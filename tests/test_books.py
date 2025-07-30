@@ -18,6 +18,7 @@ async def get_last_book_id():
 
 
 class TestBook:
+    # тест - поиск книги по названию
     @pytest.mark.parametrize(
         "title, expected_status, res, expected_exception",
         [
@@ -33,6 +34,7 @@ class TestBook:
             assert response.status_code == expected_status
             assert response.json() == res
 
+    # тест - поиск книги по id
     @pytest.mark.parametrize(
         "book_id, expected_status, res, expected_exception",
         [
@@ -48,6 +50,7 @@ class TestBook:
             assert response.status_code == expected_status
             assert response.json() == res
 
+    # тест - создание новой книги
     @pytest.mark.parametrize(
         "input_json, expected_status, expected_exception",
         [
@@ -61,6 +64,7 @@ class TestBook:
             response = await client.post(f"/books/add/", json=input_json)
             assert response.status_code == expected_status
 
+    # тест - редактирование книги
     @pytest.mark.parametrize(
         "input_json, expected_status, expected_exception",
         [
@@ -74,6 +78,7 @@ class TestBook:
             response = await client.put(f"/books/4/edit/", json=input_json)
             assert response.status_code == expected_status
 
+    # тест - удаление книги
     @pytest.mark.asyncio
     async def test_delete_book(self, get_last_book_id):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:

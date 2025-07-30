@@ -39,3 +39,17 @@ class TestStudent:
             response = await client.get(f"/students/{student_id}/")
             assert response.status_code == expected_status
             assert response.json() == res
+
+    # тест - создание нового студента
+    @pytest.mark.parametrize(
+        "input_json, expected_status, expected_exception",
+        [
+            ({"full_name": "student student", "group_number": "45st"}, 201, None),
+            ({"full_name": "student student", "group_number": "45ststst"}, 422, HTTPException),
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_create_student(self, input_json, expected_status, expected_exception):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post(f"/students/add/", json=input_json)
+            assert response.status_code == expected_status
