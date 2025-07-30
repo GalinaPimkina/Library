@@ -8,7 +8,7 @@ from library.main import app
 class TestStudent:
     # тест поиск студента по фио или номеру группы
     @pytest.mark.parametrize(
-        "query, status_code, res, expected_exception",
+        "query, expected_status, res, expected_exception",
         [
             ("12АРА",200,[{"full_name": "петров петр петрович","group_number": "12АРА"}],None,),
             ("е",200,[{"full_name": "петров петр петрович","group_number": "12АРА"},{"full_name": "семенов семен семенович","group_number": "34вп"}],None,),
@@ -16,15 +16,15 @@ class TestStudent:
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_student_by_name_or_group(self, query, status_code, res, expected_exception):
+    async def test_get_student_by_name_or_group(self, query, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get(f"/students/search/?query={query}")
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
             assert response.json() == res
 
     # тест - поиск студента по id
     @pytest.mark.parametrize(
-        "student_id, status_code, res, expected_exception",
+        "student_id, expected_status, res, expected_exception",
         [
             (1, 200, {"full_name": "петров петр петрович","group_number": "12АРА","books": [{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10,"id": 2},{"title": "пикник на обочине","author": "братья стругацкие","publish_date": 2022,"total_amount": 7,"id": 3}]}, None,),
             (100, 404, {"detail": "Студент не найден"}, HTTPException,),
@@ -34,8 +34,8 @@ class TestStudent:
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_student_by_id(self, student_id, status_code, res, expected_exception):
+    async def test_get_student_by_id(self, student_id, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get(f"/students/{student_id}/")
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
             assert response.json() == res

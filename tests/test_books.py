@@ -19,7 +19,7 @@ async def get_last_book_id():
 
 class TestBook:
     @pytest.mark.parametrize(
-        "title, status_code, res, expected_exception",
+        "title, expected_status, res, expected_exception",
         [
             ("онегин",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10, "id": 2},],None,),
             ("о",200,[{"title": "онегин","author": "пушкин","publish_date": 2006,"total_amount": 10, "id": 2},{"title": "пикник на обочине","author": "братья стругацкие","publish_date": 2022,"total_amount": 7, "id": 3}],None,),
@@ -27,14 +27,14 @@ class TestBook:
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_book_by_title(self, title, status_code, res, expected_exception):
+    async def test_get_book_by_title(self, title, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get(f"/books/search/?title={title}")
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
             assert response.json() == res
 
     @pytest.mark.parametrize(
-        "book_id, status_code, res, expected_exception",
+        "book_id, expected_status, res, expected_exception",
         [
             (1, 200, {"title": "KOLOBOK", "author": "бабушка и дедушка", "publish_date": 1996, "total_amount": 3, 'students':[{'full_name': 'семенов семен семенович','group_number': '34вп',},]}, None,),
             (100, 404, {"detail": "Книга не найдена"}, HTTPException,),
@@ -42,37 +42,37 @@ class TestBook:
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_book_by_id(self, book_id, status_code, res, expected_exception):
+    async def test_get_book_by_id(self, book_id, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get(f"/books/{book_id}/")
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
             assert response.json() == res
 
     @pytest.mark.parametrize(
-        "input_json, status_code, expected_exception",
+        "input_json, expected_status, expected_exception",
         [
             ({"title": "abc", "author": "auth", "publish_date": 2022, "total_amount": 10}, 201, None),
             ({"title": "abc", "author": "auth", "publish_date": 2222, "total_amount": 10}, 422, HTTPException),
         ]
     )
     @pytest.mark.asyncio
-    async def test_create_book(self, input_json, status_code, expected_exception):
+    async def test_create_book(self, input_json, expected_status, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(f"/books/add/", json=input_json)
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        "input_json, status_code, expected_exception",
+        "input_json, expected_status, expected_exception",
         [
             ({"title": "ABC", "author": "AUTH", "publish_date": 2022, "total_amount": 7}, 200, None),
             ({"title": "ABC", "author": "AUTH", "publish_date": 2222, "total_amount": 10}, 422, HTTPException),
         ]
     )
     @pytest.mark.asyncio
-    async def test_update_item(self, input_json, status_code, expected_exception):
+    async def test_update_item(self, input_json, expected_status, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.put(f"/books/4/edit/", json=input_json)
-            assert response.status_code == status_code
+            assert response.status_code == expected_status
 
     @pytest.mark.asyncio
     async def test_delete_book(self, get_last_book_id):
