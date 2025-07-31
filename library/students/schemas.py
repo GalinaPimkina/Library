@@ -4,28 +4,28 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class StudentPublic(BaseModel):
+class StudentUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     full_name: Annotated[str | None, Field(max_length=50)] = None
     group_number: Annotated[str | None, Field(max_length=5)] = None
 
 
-class StudentSystem(StudentPublic):
+class StudentSystem(StudentUpdate):
     id: int
     created_at: datetime
     updated_at: datetime
 
 
-class StudentListBook(StudentPublic):
+class StudentListBook(StudentUpdate):
     books: list["BookPublic"] = []
 
 
-class StudentUpdate(StudentPublic):
-    pass
+class StudentPublic(StudentUpdate):
+    id: int
 
 
-class StudentCreate(StudentPublic):
+class StudentCreate(StudentUpdate):
     pass
 
 
