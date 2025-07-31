@@ -74,7 +74,7 @@ async def update_student(student_id: Annotated[int, Path(ge=1)], student_update:
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
 
-    for field, value in student_update.dict(exclude_unset=True).items():
+    for field, value in student_update.model_dump(exclude_unset=True).items():
         setattr(student, field, value)
 
     student.updated_at = datetime.now()
