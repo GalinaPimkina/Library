@@ -1,8 +1,19 @@
 import pytest
+import pytest_asyncio
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
 
 from library.main import app
+
+
+@pytest_asyncio.fixture(scope="function")
+async def get_student_delete_id():
+    '''для теста с удалением студента получает id 4-ого в списке студента(id может быть != 5), который добавляется в предыдущем тесте через метод create.
+    студента отстортированы по возрастанию id.'''
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.get(f"/students/")
+        data = response.json()
+        return data[3]["id"]
 
 
 class TestStudent:
