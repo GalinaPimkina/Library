@@ -21,8 +21,8 @@ class TestStudent:
     @pytest.mark.parametrize(
         "query, expected_status, res, expected_exception",
         [
-            ("student_1",200,[{"full_name": "test_student_1","group_number": "t_g_1"}],None,),
-            ("student",200,[{"full_name": "test_student_1","group_number": "t_g_1"},{"full_name": "test_student_2","group_number": "t_g_2"}],None,),
+            ("student_1",200,[{"full_name": "test_student_1","group_number": "t_g_1", "id": 1}],None,),
+            ("student",200,[{"full_name": "test_student_1","group_number": "t_g_1", "id": 1},{"full_name": "test_student_2","group_number": "t_g_2", "id": 2}],None,),
             ("studentstudent",404,{"detail": "Студент не найден"}, HTTPException,),
         ]
     )
@@ -37,7 +37,7 @@ class TestStudent:
     @pytest.mark.parametrize(
         "student_id, expected_status, res, expected_exception",
         [
-            (1, 200, {"full_name": "test_student_1","group_number": "t_g_1","books": [{"title": "test_book_2","author": "test_author_2","publish_date": 2006,"total_amount": 10,"id": 2},{"title": "test_book_3","author": "test_author_3","publish_date": 2022,"total_amount": 7,"id": 3}]}, None),
+            (1, 200, {"full_name": "test_student_1","group_number": "t_g_1", "books": [{"title": "test_book_2","author": "test_author_2","publish_date": 2006,"total_amount": 10,"id": 2},{"title": "test_book_3","author": "test_author_3","publish_date": 2022,"total_amount": 7,"id": 3}]}, None),
             (100, 404, {"detail": "Студент не найден"}, HTTPException,),
             (0, 422, {"detail": [{"ctx": {"ge": 1, }, "input": "0", "loc": ["path", "student_id", ],
                                   "msg": "Input should be greater than or equal to 1",
@@ -55,12 +55,26 @@ class TestStudent:
     @pytest.mark.parametrize(
         "input_json, expected_status, expected_exception",
         [
-            ({"full_name": "test_student_3", "group_number": "t_g_3"}, 201, None),
-            ({"full_name": "test_student_4", "group_number": "test_group_4"}, 422, HTTPException),
+            ({"full_name": "test_student_4", "group_number": "t_g_4"}, 201, None),
+            ({"full_name": "test_student_5", "group_number": "test_group_5"}, 422, HTTPException),
         ]
     )
     @pytest.mark.asyncio
     async def test_create_student(self, input_json, expected_status, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(f"/students/add/", json=input_json)
+            assert response.status_code == expected_status
+
+    # тест - редактирование студента
+    @pytest.mark.parametrize(
+        "input_json, expected_status, expected_exception",
+        [
+            ({"full_name": "ABC", "group_number": "ABC"}, 200, None),
+            ({"full_name": "ABC", "group_number": "test_group_4"}, 422, HTTPException)
+        ]
+    )
+    @pytest.mark.asyncio
+    async def test_update_student(self, input_json, expected_status, expected_exception):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.put(f"/students/3/edit/", json=input_json)
             assert response.status_code == expected_status
