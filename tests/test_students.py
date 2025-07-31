@@ -78,3 +78,12 @@ class TestStudent:
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.put(f"/students/3/edit/", json=input_json)
             assert response.status_code == expected_status
+
+    # тест - удаление студента
+    @pytest.mark.asyncio
+    async def test_delete_student(self, get_student_delete_id):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.delete(f"/students/{get_student_delete_id}/delete/")
+            assert response.status_code == 200
+            response = await client.get(f"/students/{get_student_delete_id}/")
+            assert response.status_code == 404
