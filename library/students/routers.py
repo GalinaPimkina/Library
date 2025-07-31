@@ -36,7 +36,7 @@ async def get_all_students(session: AsyncSession = Depends(get_session)):
     response_model=list[StudentPublic],
     status_code=status.HTTP_200_OK
 )
-async def get_student(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+async def get_student_by_name_or_group(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Student).filter(or_(Student.full_name.ilike(f"%{query}%"), (Student.group_number.ilike(f"%{query}%")))))
     students = result.scalars().all()
     if not students:
