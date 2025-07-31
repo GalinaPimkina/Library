@@ -8,8 +8,8 @@ from library.main import app
 
 
 @pytest_asyncio.fixture(scope="function")
-async def get_last_book_id():
-    '''для теста с удалением книги получает id=5 по списку книги, которая в предыдущем тесте через метод create.
+async def get_book_delete_id():
+    '''для теста с удалением книги получает id 5-ой в списке книги(id может быть != 5), которая добавляется в предыдущем тесте через метод create.
     книги отстортированы по возрастанию id.'''
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/books/")
@@ -38,7 +38,7 @@ class TestBook:
     @pytest.mark.parametrize(
         "book_id, expected_status, res, expected_exception",
         [
-            (1, 200, {"title": "test_book_1", "author": "test_author_1", "publish_date": 1996, "total_amount": 3, 'students':[{'full_name': 'test_student_2','group_number': 't_g_2',},]}, None,),
+            (1, 200, {"title": "test_book_1", "author": "test_author_1", "publish_date": 1996, "total_amount": 3, 'students':[{'full_name': 'test_student_2','group_number': 't_g_2', 'id': 2},]}, None,),
             (100, 404, {"detail": "Книга не найдена"}, HTTPException,),
             (0, 422, {"detail": [{"ctx": {"ge": 1,}, "input": "0", "loc": ["path", "book_id",], "msg": "Input should be greater than or equal to 1", "type": "greater_than_equal",},]}, HTTPException,),
         ]
@@ -73,16 +73,16 @@ class TestBook:
         ]
     )
     @pytest.mark.asyncio
-    async def test_update_item(self, input_json, expected_status, expected_exception):
+    async def test_update_book(self, input_json, expected_status, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.put(f"/books/4/edit/", json=input_json)
             assert response.status_code == expected_status
 
     # тест - удаление книги
     @pytest.mark.asyncio
-    async def test_delete_book(self, get_last_book_id):
+    async def test_delete_book(self, get_book_delete_id):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            response = await client.delete(f"/books/{get_last_book_id}/delete/")
+            response = await client.delete(f"/books/{get_book_delete_id}/delete/")
             assert response.status_code == 200
-            response = await client.get(f"/books/{get_last_book_id}/")
+            response = await client.get(f"/books/{get_book_delete_id}/")
             assert response.status_code == 404
