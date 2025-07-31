@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, field_validator
 
 
-class BookUpdate(BaseModel):
+class BookBasic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     title: str | None = None
@@ -19,23 +19,27 @@ class BookUpdate(BaseModel):
         return value
 
 
-class BookSystem(BookUpdate):
+class BookID(BookBasic):
+    id: int
+
+
+class BookSystem(BookID):
     created_at: datetime
     updated_at: datetime
 
 
-class BookListStudent(BookUpdate):
+class BookListStudent(BookBasic):
     # taken_amount: Annotated[int | None, Field(ge=0, le=10)] = None
-    students: list["StudentPublic"] = []
+    students: list["StudentID"] = []
 
 
-class BookPublic(BookUpdate):
-    id: int
-
-
-class BookCreate(BookUpdate):
+class BookCreate(BookBasic):
     pass
 
 
-from library.students.schemas import StudentPublic
+class BookUpdate(BookBasic):
+    pass
+
+
+from library.students.schemas import StudentID
 BookListStudent.model_rebuild()

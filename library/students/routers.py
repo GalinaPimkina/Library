@@ -9,7 +9,7 @@ from starlette import status
 
 from library.database import get_session
 from library.models import Student
-from library.students.schemas import StudentPublic, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
+from library.students.schemas import StudentID, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/students", tags=["Студенты"])
 @router.get(
     "/",
     summary="Получить список всех студентов",
-    response_model=list[StudentPublic],
+    response_model=list[StudentID],
     status_code=status.HTTP_200_OK
 )
 async def get_all_students(session: AsyncSession = Depends(get_session)):
@@ -33,7 +33,7 @@ async def get_all_students(session: AsyncSession = Depends(get_session)):
 @router.get(
     "/search/",
     summary="Найти студента по ФИО или номеру группы",
-    response_model=list[StudentPublic],
+    response_model=list[StudentID],
     status_code=status.HTTP_200_OK
 )
 async def get_student_by_name_or_group(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):

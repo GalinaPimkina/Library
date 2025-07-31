@@ -13,7 +13,7 @@ from starlette import status
 
 from library.models import Book
 from library.books.schemas import (
-    BookPublic,
+    BookID,
     BookListStudent,
     BookSystem,
     BookUpdate,
@@ -29,7 +29,7 @@ router = APIRouter(prefix='/books', tags=['Книги'])
 @router.get(
     "/",
     summary="Получить список всех книг в библиотеке",
-    response_model=list[BookPublic],
+    response_model=list[BookID],
     status_code=status.HTTP_200_OK
 )
 async def get_all_books(session: AsyncSession = Depends(get_session)):
@@ -43,7 +43,7 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
 @router.get(
     "/search/",
     summary="Найти книгу по названию",
-    response_model=list[BookPublic],
+    response_model=list[BookID],
     status_code=status.HTTP_200_OK
 )
 async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
@@ -106,26 +106,6 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     await session.commit()
     return book
 
-
-# @router.post(
-#     "/{book_id}/share/{student_id}/",
-#     summary="Выдать книгу",
-#     response_model=StudentListBook,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def share_book(
-#         book_id: Annotated[int, Path(ge=1)],
-#         student_id: Annotated[int, Path(ge=1)],
-#         session: AsyncSession = Depends(get_session)
-# ):
-#     try:
-#         result = await session.execute(select(Book).where(Book.id == book_id))
-#         book = result.scalars().one()
-#     except NoResultFound:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-#
-#
-#
 # -----------------------------delete------------------------------
 
 @router.delete(
