@@ -4,7 +4,9 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException, Query, Path
+    HTTPException,
+    Query,
+    Path,
 )
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -17,7 +19,7 @@ from library.books.schemas import (
     BookListStudent,
     BookSystem,
     BookUpdate,
-    BookCreate
+    BookCreate,
 )
 from library.database import get_session
 

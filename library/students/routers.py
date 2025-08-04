@@ -1,7 +1,13 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Path,
+)
 from sqlalchemy import select, or_
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +15,12 @@ from starlette import status
 
 from library.database import get_session
 from library.models import Student
-from library.students.schemas import StudentID, StudentListBook, StudentSystem, StudentUpdate, StudentCreate
+from library.students.schemas import (
+    StudentID,
+    StudentListBook,
+    StudentSystem,
+    StudentUpdate,
+    StudentCreate,)
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
