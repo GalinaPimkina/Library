@@ -12,8 +12,7 @@ sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
 from library.database import DATABASE_URL, Base
 from library.models import Book, Student, StudentBookRelation
-from library.auth.models import User
-from library.auth.access_token import AccessToken
+from library.auth.models import User, AccessToken
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
