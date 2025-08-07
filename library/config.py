@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class AccessToken(BaseModel):
     lifetime_seconds = 3600
+    reset_password_token_secret: str
+    verification_token_secret: str
 
 
 class Settings(BaseSettings):
@@ -18,7 +20,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
     )
-    access_token: AccessToken = AccessToken()
+    access_token: AccessToken
 
 
 settings = Settings()
