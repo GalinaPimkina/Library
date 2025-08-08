@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
-from library.books.routers import router as router_books
-from library.students.routers import router as router_students
+from library.routers.books import router as router_books
+from library.routers.students import router as router_students
 
 app = FastAPI()
 
