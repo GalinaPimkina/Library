@@ -4,7 +4,7 @@ import pytest_asyncio
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
 
-from library.main import app
+from main import app
 
 
 @pytest_asyncio.fixture(scope="function")

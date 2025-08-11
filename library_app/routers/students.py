@@ -13,9 +13,9 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from library.database.db import get_session
-from library.models.students import Student
-from library.schemas.students import (
+from database.db import get_session
+from models.students import Student
+from schemas.students import (
     StudentID,
     StudentListBook,
     StudentSystem,

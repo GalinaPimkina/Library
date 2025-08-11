@@ -13,15 +13,15 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from library.models.books import Book
-from library.schemas.books import (
+from models.books import Book
+from schemas.books import (
     BookID,
     BookListStudent,
     BookSystem,
     BookUpdate,
     BookCreate,
 )
-from library.database.db import get_session
+from database.db import get_session
 
 router = APIRouter(prefix='/books', tags=['Книги'])
 

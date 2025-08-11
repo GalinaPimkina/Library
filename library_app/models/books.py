@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from library.database.db import Base
+from database.db import Base
 
 if TYPE_CHECKING:
-    from library.models.students import Student
+    from .students import Student
 
 
 class Book(Base):

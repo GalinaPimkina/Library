@@ -4,7 +4,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped
 
-from library.database.db import Base, get_session
+from database.db import Base, get_session
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):

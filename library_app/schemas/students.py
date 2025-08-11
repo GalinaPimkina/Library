@@ -32,5 +32,5 @@ class StudentUpdate(StudentBasic):
     pass
 
 
-from library.schemas.books import BookID
+from .books import BookID
 StudentListBook.model_rebuild()

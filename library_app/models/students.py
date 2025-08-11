@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
-from library.database.db import Base
+from database.db import Base
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 
 if TYPE_CHECKING:
-    from library.models.books import Book
+    from .books import Book
 
 
 class Student(Base):
