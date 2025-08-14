@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     reset_password_token_secret: str
     verification_token_secret: str
 
+    # superuser
+    superuser_email: str
+    superuser_password: str
+
 
 settings = Settings()
 
