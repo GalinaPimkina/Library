@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     DB_NAME: str
 
     # access token config
+    # python -c "import secrets; print(secrets.token_hex())"
     reset_password_token_secret: str
     verification_token_secret: str
 
