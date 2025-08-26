@@ -21,6 +21,7 @@ from schemas.students import (
     StudentSystem,
     StudentUpdate,
     StudentCreate,)
+from utils.create_student_username import get_random_username
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
@@ -103,6 +104,7 @@ async def update_student(student_id: Annotated[int, Path(ge=1)], student_update:
 )
 async def create_student(new_student: StudentCreate, session: AsyncSession = Depends(get_session)):
     student = Student(**new_student.model_dump())
+    student.username = get_random_username()
     session.add(student)
     await session.commit()
     return student
