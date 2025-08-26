@@ -18,7 +18,7 @@ superuser_password = settings.superuser_password
 
 
 async def create_superuser(
-        email: str, password: str, is_superuser: bool = True
+        email: str, password: str, is_superuser: bool = True, is_verified: bool = True,
 ):
     try:
         async with get_async_session_context() as session:
@@ -26,7 +26,7 @@ async def create_superuser(
                 async with get_user_manager_context(user_db) as user_manager:
                     superuser = await user_manager.create(
                         UserCreate(
-                            username="admin", email=email, password=password, is_superuser=is_superuser
+                            username="admin", email=email, password=password, is_superuser=is_superuser, is_verified=is_verified
                         )
                     )
                     print(f"Superuser created {superuser}")
