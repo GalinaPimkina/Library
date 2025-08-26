@@ -15,6 +15,10 @@ class StudentID(StudentBasic):
     id: int
 
 
+class StudentUsername(StudentBasic):
+    username: Annotated[str | None, Field()] = None
+
+
 class StudentSystem(StudentID):
     created_at: datetime
     updated_at: datetime
