@@ -17,17 +17,17 @@ async def get_student_delete_id():
 
 
 class TestStudent:
-    # тест поиск студента по фио или номеру группы
+    # тест поиск студента по username
     @pytest.mark.parametrize(
         "query, expected_status, res, expected_exception",
         [
-            ("student_1",200,[{"full_name": "test_student_1","group_number": "t_g_1", "id": 1}],None,),
-            ("student",200,[{"full_name": "test_student_1","group_number": "t_g_1", "id": 1},{"full_name": "test_student_2","group_number": "t_g_2", "id": 2}],None,),
-            ("studentstudent",404,{"detail": "Студент не найден"}, HTTPException,),
+            ("TESTSTUD01",200,[{"full_name": "test_student_1","group_number": "t_g_1", "username": "TESTSTUD01"}],None,),
+            ("TESTSTUD",200,[{"full_name": "test_student_1","group_number": "t_g_1", "username": "TESTSTUD01"},{"full_name": "test_student_2","group_number": "t_g_2", "username": "TESTSTUD02"}],None,),
+            ("student",404,{"detail": "Студент не найден"}, HTTPException,),
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_student_by_name_or_group(self, query, expected_status, res, expected_exception):
+    async def test_get_student_by_username(self, query, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get(f"/students/search/?query={query}")
             assert response.status_code == expected_status
