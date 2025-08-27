@@ -8,7 +8,7 @@ from fastapi import (
     Query,
     Path,
 )
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -20,7 +20,9 @@ from schemas.students import (
     StudentListBook,
     StudentSystem,
     StudentUpdate,
-    StudentCreate,)
+    StudentCreate,
+    StudentUsername,
+)
 from utils.create_student_username import get_random_username
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
@@ -44,12 +46,12 @@ async def get_all_students(session: AsyncSession = Depends(get_session)):
 
 @router.get(
     "/search/",
-    summary="Найти студента по ФИО или номеру группы",
-    response_model=list[StudentID],
+    summary="Найти студента по username",
+    response_model=list[StudentUsername],
     status_code=status.HTTP_200_OK
 )
-async def get_student_by_name_or_group(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Student).filter(or_(Student.full_name.ilike(f"%{query}%"), (Student.group_number.ilike(f"%{query}%")))))
+async def get_student_by_username(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Student).filter(Student.username.ilike(f"%{query}%")))
     students = result.scalars().all()
     if not students:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
