@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from models.books import Book
+from orm.books import BookAsyncORM
 from schemas.books import (
     BookID,
     BookListStudent,
@@ -49,10 +50,7 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     status_code=status.HTTP_200_OK
 )
 async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Book).filter(Book.title.ilike(f"%{title}%")))
-    books = result.scalars().all()
-    if not books:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+    books = await BookAsyncORM.get_book_from_title(title, session)
     return books
 
 
