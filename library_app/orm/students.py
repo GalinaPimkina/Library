@@ -1,0 +1,2 @@
+class AsyncORM:
+    pass
