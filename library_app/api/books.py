@@ -98,6 +98,7 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     book = await BookAsyncORM.create_book(new_book, session)
     return book
 
+
 # -----------------------------delete------------------------------
 
 @router.delete(
@@ -106,12 +107,5 @@ async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_
     status_code=status.HTTP_200_OK
 )
 async def delete_book(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Book).where(Book.id == book_id))
-        book = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-
-    await session.delete(book)
-    await session.commit()
+    await BookAsyncORM.delete_book(book_id, session)
     return {"message": "Книга удалена"}
