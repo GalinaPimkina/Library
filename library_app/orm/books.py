@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -9,7 +11,7 @@ from models.books import Book
 
 class BookAsyncORM:
     @staticmethod
-    async def get_all_books(async_session: AsyncSession):
+    async def get_all_books(async_session):
         async with async_session as session:
             query = (
                 select(Book)
@@ -22,7 +24,7 @@ class BookAsyncORM:
             return books
     
     @staticmethod
-    async def get_book_by_title(title: str, async_session: AsyncSession):
+    async def get_book_by_title(title, async_session):
         async with async_session as session:
             query = (
                 select(Book)
@@ -35,7 +37,7 @@ class BookAsyncORM:
             return books
 
     @staticmethod
-    async def get_book_by_id(book_id, async_session: AsyncSession):
+    async def get_book_by_id(book_id, async_session):
         async with async_session as session:
             query = select(Book).where(Book.id == book_id)
             try:
@@ -43,4 +45,22 @@ class BookAsyncORM:
                 book = result.scalars().one()
             except NoResultFound:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+            return book
+
+    @staticmethod
+    async def update_book(book_id, book_update, async_session):
+        async with async_session as session:
+            query = select(Book).where(Book.id == book_id)
+            try:
+                result = await session.execute(query)
+                book = result.scalars().one()
+            except NoResultFound:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+
+            for field, value in book_update.model_dump(exclude_unset=True).items():
+                setattr(book, field, value)
+
+            book.updated_at = datetime.now()
+            await session.commit()
+
             return book
