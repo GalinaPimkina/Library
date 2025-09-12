@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated
 
 from fastapi import (
@@ -96,9 +95,7 @@ async def update_book(
     status_code=status.HTTP_201_CREATED
 )
 async def create_book(new_book: BookCreate, session: AsyncSession = Depends(get_session)):
-    book = Book(**new_book.model_dump())
-    session.add(book)
-    await session.commit()
+    book = await BookAsyncORM.create_book(new_book, session)
     return book
 
 # -----------------------------delete------------------------------
