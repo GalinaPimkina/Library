@@ -58,11 +58,7 @@ async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSessio
     status_code=status.HTTP_200_OK
 )
 async def get_book_by_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Book).where(Book.id == book_id))
-        book = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+    book = await BookAsyncORM.get_book_by_id(book_id, session)
     return book
 
 
