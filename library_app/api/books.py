@@ -3,16 +3,12 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
     Query,
     Path,
 )
-from sqlalchemy import select
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.books import Book
 from orm.books import BookAsyncORM
 from schemas.books import (
     BookID,
