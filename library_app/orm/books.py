@@ -71,3 +71,16 @@ class BookAsyncORM:
             session.add(book)
             await session.commit()
             return book
+
+    @staticmethod
+    async def delete_book(book_id, async_session):
+        async with async_session as session:
+            query = select(Book).where(Book.id == book_id)
+            try:
+                result = await session.execute(query)
+                book = result.scalars().one()
+            except NoResultFound:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
+
+            await session.delete(book)
+            await session.commit()
