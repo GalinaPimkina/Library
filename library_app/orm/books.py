@@ -8,14 +8,27 @@ from models.books import Book
 
 class BookAsyncORM:
     @staticmethod
-    async def get_book_from_title(title: str, async_session: AsyncSession):
+    async def get_all_books(async_session: AsyncSession):
+        async with async_session as session:
+            query = (
+                select(Book)
+                .order_by(Book.id)
+            )
+            result = await session.execute(query)
+            books = result.scalars().all()
+            if not books:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книги не найдены")
+            return books
+    
+    @staticmethod
+    async def get_book_by_title(title: str, async_session: AsyncSession):
         async with async_session as session:
             query = (
                 select(Book)
                 .filter(Book.title.ilike(f"%{title}%"))
             )
-            res = await session.execute(query)
-            result = res.scalars().all()
-            if not result:
+            result = await session.execute(query)
+            books = result.scalars().all()
+            if not books:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-            return result
+            return books
