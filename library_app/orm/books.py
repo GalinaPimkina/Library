@@ -62,5 +62,12 @@ class BookAsyncORM:
 
             book.updated_at = datetime.now()
             await session.commit()
+            return book
 
+    @staticmethod
+    async def create_book(new_book, async_session):
+        async with async_session as session:
+            book = Book(**new_book.model_dump())
+            session.add(book)
+            await session.commit()
             return book
