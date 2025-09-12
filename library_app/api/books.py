@@ -35,7 +35,9 @@ router = APIRouter(prefix='/books', tags=['Книги'])
     response_model=list[BookID],
     status_code=status.HTTP_200_OK
 )
-async def get_all_books(session: AsyncSession = Depends(get_session)):
+async def get_all_books(
+        session: AsyncSession = Depends(get_session)
+):
     books = await BookAsyncORM.get_all_books(session)
     return books
 
@@ -46,7 +48,10 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     response_model=list[BookID],
     status_code=status.HTTP_200_OK
 )
-async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+async def get_book_by_title(
+        title: Annotated[str, Query()],
+        session: AsyncSession = Depends(get_session)
+):
     books = await BookAsyncORM.get_book_by_title(title, session)
     return books
 
@@ -57,7 +62,10 @@ async def get_book_by_title(title: Annotated[str, Query()], session: AsyncSessio
     response_model=BookListStudent,
     status_code=status.HTTP_200_OK
 )
-async def get_book_by_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
+async def get_book_by_id(
+        book_id: Annotated[int, Path(ge=1)],
+        session: AsyncSession = Depends(get_session)
+):
     book = await BookAsyncORM.get_book_by_id(book_id, session)
     return book
 
@@ -70,18 +78,12 @@ async def get_book_by_id(book_id: Annotated[int, Path(ge=1)], session: AsyncSess
     response_model=BookSystem,
     status_code=status.HTTP_200_OK,
 )
-async def update_book(book_id: Annotated[int, Path(ge=1)], book_update: BookUpdate, session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Book).where(Book.id == book_id))
-        book = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
-
-    for field, value in book_update.model_dump(exclude_unset=True).items():
-        setattr(book, field, value)
-
-    book.updated_at = datetime.now()
-    await session.commit()
+async def update_book(
+        book_id: Annotated[int, Path(ge=1)],
+        book_update: BookUpdate,
+        session: AsyncSession = Depends(get_session)
+):
+    book = await BookAsyncORM.update_book(book_id, book_update, session)
     return book
 
 
