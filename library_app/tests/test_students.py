@@ -19,7 +19,7 @@ async def get_student_delete_id():
 class TestStudent:
     # тест поиск студента по username
     @pytest.mark.parametrize(
-        "query, expected_status, res, expected_exception",
+        "username, expected_status, res, expected_exception",
         [
             ("TESTSTUD01",200,[{"full_name": "test_student_1","group_number": "t_g_1", "username": "TESTSTUD01"}],None,),
             ("TESTSTUD",200,[{"full_name": "test_student_1","group_number": "t_g_1", "username": "TESTSTUD01"},{"full_name": "test_student_2","group_number": "t_g_2", "username": "TESTSTUD02"}],None,),
@@ -27,9 +27,9 @@ class TestStudent:
         ]
     )
     @pytest.mark.asyncio
-    async def test_get_student_by_username(self, query, expected_status, res, expected_exception):
+    async def test_get_student_by_username(self, username, expected_status, res, expected_exception):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            response = await client.get(f"/students/search/?query={query}")
+            response = await client.get(f"/students/search/?username={username}")
             assert response.status_code == expected_status
             assert response.json() == res
 
