@@ -72,18 +72,8 @@ async def get_student_from_id(student_id: Annotated[int, Path(ge=1)], session: A
     response_model=StudentSystem,
     status_code=status.HTTP_200_OK,
 )
-async def update_student(student_id: Annotated[int, Path(ge=1)], student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Student).where(Student.id == student_id))
-        student = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
-
-    for field, value in student_update.model_dump(exclude_unset=True).items():
-        setattr(student, field, value)
-
-    student.updated_at = datetime.now()
-    await session.commit()
+async def update_student(student_id: Annotated[int, Path(ge=1)], update: StudentUpdate, session: AsyncSession = Depends(get_session)):
+    student = await StudentAsyncORM.update_student(student_id, update, session)
     return student
 
 
