@@ -6,6 +6,7 @@ from sqlalchemy.exc import NoResultFound
 from starlette import status
 
 from models.students import Student
+from utils.create_student_username import get_random_username
 
 
 class StudentAsyncORM:
@@ -58,6 +59,14 @@ class StudentAsyncORM:
             await session.commit()
             return student
 
+    @staticmethod
+    async def create_student(new_student, async_session):
+        async with async_session as session:
+            student = Student(**new_student.model_dump())
+            student.username = get_random_username()
+            session.add(student)
+            await session.commit()
+            return student
 
 
 
