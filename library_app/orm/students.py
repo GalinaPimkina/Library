@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 from starlette import status
 
 from models.students import Student
@@ -9,7 +10,7 @@ class StudentAsyncORM:
     @staticmethod
     async def get_all_students(async_session):
         async with async_session as session:
-            query = (select(Student).order_by(Student.id))
+            query = select(Student).order_by(Student.id)
             result = await session.execute(query)
             students = result.scalars().all()
             if not students:
@@ -19,9 +20,27 @@ class StudentAsyncORM:
     @staticmethod
     async def get_student_by_username(username, async_session):
         async with async_session as session:
-            query = (select(Student).filter(Student.username.ilike(f"%{username}%")))
+            query = select(Student).filter(Student.username.ilike(f"%{username}%"))
             result = await session.execute(query)
             students = result.scalars().all()
             if not students:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
             return students
+
+    @staticmethod
+    async def get_student_from_id(student_id, async_session):
+        async with async_session as session:
+            query = select(Student).where(Student.id == student_id)
+            try:
+                result = await session.execute(query)
+                student = result.scalars().one()
+            except NoResultFound:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+            return student
+
+
+
+
+
+
+
