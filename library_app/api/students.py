@@ -47,11 +47,8 @@ async def get_all_students(session: AsyncSession = Depends(get_session)):
     response_model=list[StudentUsername],
     status_code=status.HTTP_200_OK
 )
-async def get_student_by_username(query: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Student).filter(Student.username.ilike(f"%{query}%")))
-    students = result.scalars().all()
-    if not students:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+async def get_student_by_username(username: Annotated[str, Query()], session: AsyncSession = Depends(get_session)):
+    students = await StudentAsyncORM.get_student_by_username(username, session)
     return students
 
 
