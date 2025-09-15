@@ -68,7 +68,18 @@ class StudentAsyncORM:
             await session.commit()
             return student
 
+    @staticmethod
+    async def delete_student(student_id, async_session):
+        async with async_session as session:
+            query = select(Student).where(Student.id == student_id)
+            try:
+                result = await session.execute(query)
+                student = result.scalars().one()
+            except NoResultFound:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
 
+            await session.delete(student)
+            await session.commit()
 
 
 
