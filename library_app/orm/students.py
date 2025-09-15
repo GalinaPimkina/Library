@@ -15,3 +15,13 @@ class StudentAsyncORM:
             if not students:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студенты не найдены")
             return students
+
+    @staticmethod
+    async def get_student_by_username(username, async_session):
+        async with async_session as session:
+            query = (select(Student).filter(Student.username.ilike(f"%{username}%")))
+            result = await session.execute(query)
+            students = result.scalars().all()
+            if not students:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+            return students
