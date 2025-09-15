@@ -15,6 +15,7 @@ from starlette import status
 
 from database.db import get_session
 from models.students import Student
+from orm.students import StudentAsyncORM
 from schemas.students import (
     StudentID,
     StudentListBook,
@@ -59,11 +60,7 @@ async def get_student_by_username(username: Annotated[str, Query()], session: As
     status_code=status.HTTP_200_OK
 )
 async def get_student_from_id(student_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Student).where(Student.id == student_id))
-        student = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+    student = await StudentAsyncORM.get_student_from_id(student_id, session)
     return student
 
 
