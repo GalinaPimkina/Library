@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -38,9 +40,37 @@ class StudentAsyncORM:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
             return student
 
+    @staticmethod
+    async def update_student(student_id, update, async_session):
+        async with async_session as session:
+
+            query = select(Student).where(Student.id == student_id)
+            try:
+                result = await session.execute(query)
+                student = result.scalars().one()
+            except NoResultFound:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
+
+            for field, value in update.model_dump(exclude_unset=True).items():
+                setattr(student, field, value)
+
+            student.updated_at = datetime.now()
+            await session.commit()
+            return student
 
 
 
 
 
 
+    # @staticmethod
+    # async def add_vacancies_and_replies():
+    #     async with async_session_factory() as session:
+    #         new_vacancy = VacanciesOrm(title="Python разработчик", compensation=100000)
+    #         get_resume_1 = select(ResumesOrm).options(selectinload(ResumesOrm.vacancies_replied)).filter_by(id=1)
+    #         get_resume_2 = select(ResumesOrm).options(selectinload(ResumesOrm.vacancies_replied)).filter_by(id=2)
+    #         resume_1 = (await session.execute(get_resume_1)).scalar_one()
+    #         resume_2 = (await session.execute(get_resume_2)).scalar_one()
+    #         resume_1.vacancies_replied.append(new_vacancy)
+    #         resume_2.vacancies_replied.append(new_vacancy)
+    #         await session.commit()
