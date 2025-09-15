@@ -1,20 +1,15 @@
-from datetime import datetime
 from typing import Annotated
 
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
     Query,
     Path,
 )
-from sqlalchemy import select
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from database.db import get_session
-from models.students import Student
 from orm.students import StudentAsyncORM
 from schemas.students import (
     StudentID,
@@ -24,7 +19,6 @@ from schemas.students import (
     StudentCreate,
     StudentUsername,
 )
-from utils.create_student_username import get_random_username
 
 router = APIRouter(prefix="/students", tags=["Студенты"])
 
@@ -98,12 +92,5 @@ async def create_student(new_student: StudentCreate, session: AsyncSession = Dep
     status_code=status.HTTP_200_OK,
 )
 async def delete_student(student_id: Annotated[int, Path(ge=1)], session: AsyncSession = Depends(get_session)):
-    try:
-        result = await session.execute(select(Student).where(Student.id == student_id))
-        student = result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студент не найден")
-
-    await session.delete(student)
-    await session.commit()
+    await StudentAsyncORM.delete_student(student_id, session)
     return {"message": "Студент удален"}
