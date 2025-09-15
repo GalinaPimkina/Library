@@ -37,10 +37,7 @@ router = APIRouter(prefix="/students", tags=["Студенты"])
     status_code=status.HTTP_200_OK
 )
 async def get_all_students(session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Student).order_by(Student.id))
-    students = result.scalars().all()
-    if not students:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Студенты не найдены")
+    students = await StudentAsyncORM.get_all_students(session)
     return students
 
 
